@@ -1,0 +1,6 @@
+{
+  "name": "PromptPaste",
+  "description": "Local-first AI Prompt Manager featuring fast clipboard copying, categories, favorites, search, and JSON import/export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
