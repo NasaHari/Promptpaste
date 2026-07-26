@@ -1,0 +1,52 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: 4. Install npm dependencies
+        run: npm install
+
+      - name: 5. Build React web application
+        run: npm run build
+
+      - name: 6. Setup Capacitor and sync Android platform
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "PromptPaste" "com.promptpaste.app" --web-dir dist || true
+          npx cap add android || true
+          npx cap sync android
+
+      - name: 7. Build Android APK via Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 8. Upload generated APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PromptPaste-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
